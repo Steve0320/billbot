@@ -12,16 +12,19 @@ class Statuses
 	VIDEO_PATH = "#{STATUS_ROOT}/watching_statuses.txt"
 	QUOTES_PATH = "#{STATUS_ROOT}/quotes.txt"
 
+	# Time intervals
+	MIN_INTERVAL = 5
+	MAX_INTERVAL = 30
+
 	# Run functions on ready
 	def start
 
-		# Randomly set status every 10-40 minutes (for spookyness)
+		# Randomly set status every 5-30 minutes (for spookyness)
 		@bot.ready do
 			@status_thread = Thread.new do
 				loop do
 					set_random_status
-					#next_sleep = Random.rand(10..40)
-					next_sleep = 1
+					next_sleep = Random.rand(MIN_INTERVAL..MAX_INTERVAL)
 					info("Next status update in #{next_sleep} minutes")
 					sleep(next_sleep * 60)
 				end
