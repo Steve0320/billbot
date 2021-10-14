@@ -18,10 +18,13 @@ class Statuses
 		# Randomly set status every 10-40 minutes (for spookyness)
 		@bot.ready do
 			@status_thread = Thread.new do
-				set_random_status
-				next_sleep = Random.rand(10..40)
-				info("Next status update in #{next_sleep} minutes")
-				sleep(next_sleep * 60)
+				loop do
+					set_random_status
+					#next_sleep = Random.rand(10..40)
+					next_sleep = 1
+					info("Next status update in #{next_sleep} minutes")
+					sleep(next_sleep * 60)
+				end
 			end
 		end
 
