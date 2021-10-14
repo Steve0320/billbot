@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord Bot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=[YOUR USER HERE]
+Group=[YOUR GROUP HERE]
+WorkingDirectory=[YOUR DIRECTORY HERE]
+Restart=always
+ExecStart=/usr/bin/ruby main.rb
+
+[Install]
+WantedBy=multi-user.target
