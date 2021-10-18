@@ -20,28 +20,35 @@ class Main
 
 		logger.info("Invite URL: #{bot.invite_url}")
 		bot.ready { logger.info("Bot successfully connected to Discord") }
+		bot.mention { |e| logger.info("Got tagged: #{e.message.to_s}") }
 
 		# Initialize all plugins
-		plugins = plugin_classes.map { |p| p.new(bot, logger) }
+		plugins = plugin_classes.map do |p|
+			p.new.tap do |o|
+				o.bot = bot
+				o.logger = logger
+				o.config = @config
+			end
+		end
 		logger.info("Found #{plugins.count} plugins: #{plugins.map(&:plugin_name).join(', ')}")
 
 		# Register plugin functionality
 		plugins.each do |p|
 			begin
 				p.start
-				Discordrb::LOGGER.info("Successfully started #{p.plugin_name} plugin")
+				logger.info("Successfully started #{p.plugin_name} plugin")
 			rescue StandardError => e
-				Discordrb::LOGGER.info("Failed to start #{p.plugin_name}: #{e.message}")
+				logger.info("Failed to start #{p.plugin_name}: #{e.message}")
 			end
 		end
 
 		# Main loop - start the bot and block
 		begin
-			Discordrb::LOGGER.info("Starting bot")
+			logger.info("Starting bot")
 			bot.run(true)
 			sleep
 		rescue Interrupt => e
-			Discordrb::LOGGER.info("Stopping bot")
+			logger.info("Stopping bot")
 			plugins.each { |p| p.stop(bot) }
 			bot.stop
 		end
@@ -52,7 +59,12 @@ class Main
 	# If the config file exists already, load and return
 	def self.load_config
 
-		expected_keys = %w[bot_token notification_channel_id]
+		expected_keys = ['bot_token']
+
+		# Load any config keys required by modules
+		plugin_classes.each do |p|
+			expected_keys += p.required_config_keys.map(&:to_s)
+		end
 
 		# Ensure config exists
 		unless File.file?(CONFIG_PATH)
@@ -72,12 +84,6 @@ class Main
 
 		@config = config
 
-	end
-
-	# Update the config keys and write to file
-	def self.modify_config(mods)
-		@config = @config.merge(mods)
-		File.write(CONFIG_PATH, @config.to_yaml)
 	end
 
 	# Convenience accessor to abstract away global variables a bit

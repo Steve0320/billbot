@@ -20,14 +20,17 @@ module Pluggable
 			self.name
 		end
 
+		# Any keys required for the plugin
+		def required_config_keys
+			[]
+		end
+
 	end
 
-	# Default constructor - called by the main file during initialization. Can be overridden,
-	# but must take the same arguments.
-	def initialize(bot, logger)
-		@bot = bot
-		@logger = logger
-	end
+	# Accessors for all instance variables set by the instantiator
+	attr_accessor :bot
+	attr_accessor :logger
+	attr_accessor :config
 
 	# Shorthand info
 	def info(str)
@@ -35,13 +38,13 @@ module Pluggable
 	end
 
 	# Modules should implement this
-	def start(bot)
+	def start
 		info("Loaded a plugin with no behavior")
 	end
 
 	# Modules may optionally implement this to close out their
 	# resources gracefully.
-	def stop(bot)
+	def stop
 	end
 
 	# Convenience accessor
