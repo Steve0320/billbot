@@ -53,7 +53,7 @@ class DeepText
 
 			response = complete_text("#{name} once said: ")
 			if response
-				event.respond(response)
+				event.respond(parse_quote(response))
 			else
 				event.respond("I couldn't find a quote for that'un. You sure they exist?")
 			end
@@ -80,6 +80,23 @@ class DeepText
 			end
 
 		end
+
+	end
+
+	# Limit the text to just the first pair of quotation marks (and
+	# any preceding text).
+	def parse_quote(text)
+
+		counter = 0
+		output = []
+
+		text.each_char do |c|
+			counter += 1 if c == "\""
+			output << c
+			break if counter == 2
+		end
+
+		return output.join
 
 	end
 
