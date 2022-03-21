@@ -44,6 +44,22 @@ class DeepText
 		
 		end
 
+		# Famous quotes generator
+		quote_regex = /give me an{0,1} (.*) quote/i
+		@bot.mention(contains: quote_regex) do |event|
+
+			name = event.message.to_s.match(quote_regex).captures[0]&.split(' ')&.map(&:capitalize)&.join(' ')
+			info("Issuing probably-libelous quote for #{name}")
+
+			response = complete_text("#{name} once said: ")
+			if response
+				event.respond(response)
+			else
+				event.respond("I couldn't find a quote for that'un. You sure they exist?")
+			end
+
+		end
+
 		# Write a bad erotic pairing. Potential employers plz ignore, thx
 		@bot.mention(contains: /write me a bad fanfic/i) do |event|
 
