@@ -42,6 +42,11 @@ module Pluggable
 		info("Loaded a plugin with no behavior")
 	end
 
+	# Modules may implement this to perform pre-start behavior. This can
+	# be useful for setup steps that require user input, for example.
+	def setup
+	end
+
 	# Modules may optionally implement this to close out their
 	# resources gracefully.
 	def stop

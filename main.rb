@@ -32,6 +32,15 @@ class Main
 		end
 		logger.info("Found #{plugins.count} plugins: #{plugins.map(&:plugin_name).join(', ')}")
 
+		# Run pre-start hooks
+		plugins.each do |p|
+			begin
+				p.setup
+			rescue StandardError => e
+				logger.info("Setup hook for #{p.plugin_name} failed: #{e.message}")
+			end
+		end
+
 		# Register plugin functionality
 		plugins.each do |p|
 			begin
@@ -48,8 +57,8 @@ class Main
 			bot.run(true)
 			sleep
 		rescue Interrupt => e
-			logger.info("Stopping bot")
-			plugins.each { |p| p.stop(bot) }
+			logger.info("Stopping bot: #{e.message}")
+			plugins.each { |p| p.stop }
 			bot.stop
 		end
 

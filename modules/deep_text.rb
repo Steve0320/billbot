@@ -51,7 +51,7 @@ class DeepText
 			name = event.message.to_s.match(quote_regex).captures[0]&.split(' ')&.map(&:capitalize)&.join(' ')
 			info("Issuing probably-libelous quote for #{name}")
 
-			response = complete_text("#{name} once said: ")
+			response = complete_text("#{name} once said: \"")
 			if response
 				event.respond(parse_quote(response))
 			else
