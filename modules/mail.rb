@@ -77,7 +77,7 @@ class Mail
       end
 
       relevant_users = event.server.members - (event.server.bot_members + [event.author])
-      price = (amount / relevant_users.count).ceil(2)
+      price = (amount / (relevant_users.count + 1)).ceil(2)
       response = relevant_users.map { |u| "#{u.mention}: $#{'%.2f' % price}" }.join("\n")
 
       event.respond(response)
