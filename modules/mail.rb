@@ -54,9 +54,34 @@ class Mail
       end
     end
 
+    # Trigger manual bill check - usually called on timer
     @bot.mention(contains: /check for bills/i) do |event|
       event.respond("Checkin' now, I'll post anythin' new to the bill channel when I'm done")
       post_messages
+    end
+
+    # Helper to divide up an amount evenly among all members in the server
+    divide_trigger = /divvy up \${0,1}([1-9]+[0-9]*\.{0,1}[0-9]+)/i
+    @bot.mention(contains: divide_trigger) do |event|
+
+      amount = event.message.to_s.match(divide_trigger).captures[0]&.to_f
+      if !amount || amount == 0
+        event.respond("That don't look like no number I ever seen.")
+        next
+      end
+
+      # Get the list of everyone on the server, minus bots and the tagger
+      if event.server.nil?
+        event.respond("This don't work in PM's, dummy.")
+        next
+      end
+
+      relevant_users = event.server.members - (event.server.bot_members + [event.author])
+      price = (amount / relevant_users.count).ceil(2)
+      response = relevant_users.map { |u| "#{u.mention}: $#{'%.2f' % price}" }.join("\n")
+
+      event.respond(response)
+
     end
 
   end
